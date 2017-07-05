@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as authorActions from '../../actions/authorActions';
@@ -15,6 +15,7 @@ class ManageAuthorPage extends Component {
         };
 
         this.updateAuthorState = this.updateAuthorState.bind(this);
+        this.saveAuthor = this.saveAuthor.bind(this);
     }
     componentWillReceiveProps(nextProps) {
         if (this.props.author.id != nextProps.author.id) {
@@ -26,7 +27,6 @@ class ManageAuthorPage extends Component {
     }
 
     updateAuthorState(event) {
-        debugger;
         const field = event.target.name;
         let author = this.state.author;
         author[field] = event.target.value;
@@ -36,7 +36,26 @@ class ManageAuthorPage extends Component {
     }
 
     saveAuthor(event) {
+        event.preventDefault();
+        this.setState({
+            saving: true
+        });
+        this.props.actions.saveAuthors(this.state.author)
+            .then(() => this.redirect())
+            .catch(error => {
+                toastr.error(error);
+                this.setState({
+                    saving: false
+                });
+            })
+    }
 
+    redirect() {
+        this.setState({
+            saving: false
+        });
+        toastr.success('Author Saved');
+        this.context.router.push('/authors');
     }
 
     render() {
@@ -48,6 +67,10 @@ class ManageAuthorPage extends Component {
         );
     }
 }
+
+ManageAuthorPage.contextTypes = {
+    router: PropTypes.object
+};
 
 function getAuthorbyId(authors, id) {
     const author = authors.filter(author => author.id == id);
@@ -67,4 +90,10 @@ function mapStateToProps(state, ownProps) {
         author: author
     };
 }
-export default connect(mapStateToProps)(ManageAuthorPage);
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(authorActions, dispatch)
+    };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(ManageAuthorPage);
