@@ -96,12 +96,27 @@ class CourseApi {
         });
     }
 
+    static checkAuthorForCourse(authorID) {
+        let courseAuthorID = 'na';
+        course = Object.assign({}, courses);
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const existingCourseIndex = courses.findIndex(a => a.id == authorID);
+                if (existingCourseIndex == 0 || existingCourseIndex == null) {
+                    courseAuthorID = 'true';
+                }
+                else {
+                    courseAuthorID = 'false';
+                }
+                resolve(courseAuthorID);
+            }, delay);
+        });
+    }
+
     static deleteCourse(courseId) {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
-                const indexOfCourseToDelete = courses.findIndex(course => {
-                    course.id == courseId;
-                });
+                const indexOfCourseToDelete = courses.findIndex(course => { course.id == courseId; });
                 courses.splice(indexOfCourseToDelete, 1);
                 resolve();
             }, delay);
